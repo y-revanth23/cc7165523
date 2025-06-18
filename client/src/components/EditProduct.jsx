@@ -8,18 +8,20 @@ function EditProduct() {
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('products')) || [];
-    const found = stored.find(p => p.id === parseInt(id));
-    if (!found) return navigate('/');
-    setProduct(found);
+    fetch(`http://localhost:5000/api/products/${id}`)
+      .then(res => res.json())
+      .then(data => setProduct(data))
+      .catch(() => navigate('/'));
   }, [id, navigate]);
 
-  const handleUpdate = (updatedProduct) => {
-    const stored = JSON.parse(localStorage.getItem('products')) || [];
-    const updatedList = stored.map(p => p.id === parseInt(id) ? updatedProduct : p);
-    localStorage.setItem('products', JSON.stringify(updatedList));
+  const handleUpdate = async (updatedProduct) => {
+    await fetch(`http://localhost:5000/api/products/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedProduct),
+    });
     navigate('/');
-  }
+  };
 
   return (
     <div>

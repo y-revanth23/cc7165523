@@ -1,106 +1,59 @@
-const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const Product = require("./models/product");
 
 const app = express();
-const PORT = 5000;
-
-const DATA_DIR = path.join(__dirname, "data");
-const DATA_PATH = path.join(DATA_DIR, "product.json");
-
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-if (!fs.existsSync(DATA_PATH)) {
-  fs.writeFileSync(DATA_PATH, "[]", "utf-8");
-}
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
 
-const readProduct = () => {
-  try {
-    const data = fs.readFileSync(DATA_PATH, "utf-8");
-    return JSON.parse(data || "[]");
-  } catch (err) {
-    return [];
-  }
-};
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((error) => {
+    console.error("Error connecting to MongoDB:", error);
+    process.exit(1); // Exit the process if connection fails
+  });
 
-const writeProduct = (data) => {
-  try {
-    fs.writeFileSync(DATA_PATH, JSON.stringify(data, null, 2), "utf-8");
-  } catch (err) {}
-};
-
-app.get('/', (req, res) => {
-  res.send('Product API is running!');
+app.get("/", (req, res) => {
+  res.send("API is running!");
 });
 
-app.get('/api/products', (req, res) => {
-  const products = readProduct();
+// get all products
+app.get("/api/products", async (req, res) => {
+  const products = await Product.find();
   res.json(products);
 });
 
-app.get('/api/products/:id', (req, res) => {
-  const products = readProduct();
-  const product = products.find(p => p.id === req.params.id);
-  if (product) {
-    res.json(product);
-  } else {
-    res.status(404).json({ message: "Product not found" });
-  }
+// get product by id
+app.get("/api/products/:id", async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if(product) res.json(product);
+  else res.status(404).json({ message: "product not found" });
 });
 
-app.post('/api/products', (req, res) => {
-  const { name, description, image, price, category, rating } = req.body;
-
-  if (!name || !price || !image || !description) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
-
-  const products = readProduct();
-
-  const newProduct = {
-    id: Date.now().toString(),
-    name,
-    description,
-    image,
-    price,
-    category: category || "Uncategorized",
-    rating: rating || "0"
-  };
-
-  products.push(newProduct);
-  writeProduct(products);
-  res.status(201).json(newProduct);
+// add a new product
+app.post("/api/products", async (req, res) => {
+  const newProduct = new Product(req.body);
+  await newProduct.save();
+  res.status(201).json({ message: "Product added successfully", product: newProduct });
 });
 
-app.put('/api/products/:id', (req, res) => {
-  const products = readProduct();
-  const id = req.params.id;
-  const index = products.findIndex(p => p.id === id);
-
-  if (index !== -1) {
-    products[index] = { ...products[index], ...req.body };
-    writeProduct(products);
-    res.json({ message: "Product updated successfully" });
-  } else {
-    res.status(404).json({ message: "Product not found" });
-  }
+// update an existing product
+app.put("/api/products/:id", async (req, res) => {
+  await Product.findByIdAndUpdate(req.params.id, req.body);
+  res.json({ message: "Product updated successfully" });
 });
 
-app.delete('/api/products/:id', (req, res) => {
-  const products = readProduct();
-  const newProducts = products.filter(p => p.id !== req.params.id);
-
-  if (newProducts.length !== products.length) {
-    writeProduct(newProducts);
-    res.json({ message: "Product deleted successfully" });
-  } else {
-    res.status(404).json({ message: "Product not found" });
-  }
+// delete a product
+app.delete("/api/products/:id", async (req, res) => {
+  await Product.findByIdAndDelete(req.params.id);
+  res.json({ message: "Product deleted successfully" });
 });
 
 app.use((req, res) => {
@@ -108,5 +61,5 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running at: http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -22,7 +22,7 @@ function ProductForm({ onAdd, initialData }) {
     if (!form.name || !form.price) {
       return alert("Name and Price are required");
     }
-    onAdd({ ...form, id: initialData?.id || Date.now() });
+    onAdd(form);
     if (!initialData) {
       setForm({ name: "", price: "", rating: "", description: "", image: "" });
     }

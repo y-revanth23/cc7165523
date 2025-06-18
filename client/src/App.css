@@ -1,23 +1,19 @@
 @import "tailwindcss";
 
-html, body, #root {
+html, body {
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
-}
-
-body {
   font-family: 'Segoe UI', sans-serif;
-  overflow-x: hidden;
 }
 
-.bg-main {
-  background-image: url('https://img.freepik.com/free-photo/black-friday-sales-sign-neon-light_23-2151833076.jpg?semt=ais_hybrid&w=740');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: center;
 }
 
 .logo {
@@ -26,9 +22,11 @@ body {
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -55,3 +53,4 @@ body {
 .read-the-docs {
   color: #888;
 }
+

@@ -1,55 +1,72 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/productCardAnimation.css"; // Make sure this CSS exists
 
 function ProductCard({ product, onDelete }) {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
 
-  const toggleMenu = () => setShowMenu(!showMenu);
-  const handleEdit = () => navigate(`/edit/${product.id}`);
+  const toggleMenu = (e) => {
+    e.stopPropagation();
+    setShowMenu((prev) => !prev);
+  };
+
+  const handleEdit = (e) => {
+    e.stopPropagation();
+    navigate(`/edit/${product._id}`);
+    setShowMenu(false);
+  };
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    onDelete(product._id);
+    setShowMenu(false);
+  };
 
   return (
     <div
-      className="relative bg-gray-800 text-yellow-300 border border-gray-700 rounded-xl p-4 shadow-md transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:z-10"
+      className="product-card border border-gray-700 rounded-2xl p-4 text-yellow-400 relative cursor-pointer"
     >
-      {/* Three Dots */}
-      <div className="absolute top-2 right-2 z-20">
+      <div className="animated-glow"></div>
+
+      <img
+        src={product.image}
+        alt={product.name}
+        className="w-full h-40 object-contain bg-white rounded-xl mb-3 z-10 relative"
+      />
+      <h2 className="text-lg font-semibold z-10 relative">{product.name}</h2>
+      <p className="z-10 relative">₹{product.price}</p>
+      <p className="text-sm z-10 relative">Rating: {product.rating} / 5</p>
+      <p className="text-sm mb-3 z-10 relative">{product.description}</p>
+
+      <div className="absolute top-3 right-3 z-10">
         <button
-          className="text-yellow-400 text-xl font-bold"
           onClick={toggleMenu}
+          className="text-yellow-400 hover:text-yellow-200 text-xl font-bold"
         >
           ⋮
         </button>
+
         {showMenu && (
-          <div className="absolute right-0 mt-2 w-28 bg-gray-900 border border-gray-600 rounded shadow-lg z-30">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="absolute right-0 mt-2 w-28 border border-gray-600 rounded-md shadow-lg z-20 bg-black"
+          >
             <button
               onClick={handleEdit}
-              className="block w-full px-4 py-2 text-left text-yellow-300 hover:bg-gray-700"
+              className="block w-full px-4 py-2 text-sm text-yellow-400 text-left hover:text-yellow-200"
             >
-              Edit
+              ✏️ Edit
             </button>
             <button
-              onClick={() => onDelete(product.id)}
-              className="block w-full px-4 py-2 text-left text-red-400 hover:bg-gray-700"
+              onClick={handleDelete}
+              className="block w-full px-4 py-2 text-sm text-red-500 text-left hover:text-red-400"
             >
-              Delete
+              🗑️ Delete
             </button>
           </div>
         )}
       </div>
-
-      {/* Image */}
-      <img
-        src={product.image}
-        alt={product.name}
-        className="w-full h-40 object-contain bg-gray-700 rounded-md mb-3"
-      />
-
-      {/* Product Info */}
-      <h2 className="text-xl font-semibold">{product.name}</h2>
-      <p className="text-yellow-200 text-md">₹{product.price}</p>
-      <p className="text-sm text-yellow-300">Rating: {product.rating} / 5</p>
-      <p className="text-sm text-yellow-400 mb-2">{product.description}</p>
     </div>
   );
 }
