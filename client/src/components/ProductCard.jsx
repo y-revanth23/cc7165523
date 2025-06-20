@@ -62,7 +62,7 @@ function ProductCard({ product, onDelete }) {
               onClick={handleDelete}
               className="block w-full px-4 py-2 text-sm text-red-500 text-left hover:text-red-400"
             >
-              🗑️ Delete
+              🗑️Delete
             </button>
           </div>
         )}
