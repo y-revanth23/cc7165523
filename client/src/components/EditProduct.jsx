@@ -8,14 +8,14 @@ function EditProduct() {
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/products/${id}`)
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/api/products/${id}`)
       .then(res => res.json())
       .then(data => setProduct(data))
       .catch(() => navigate('/'));
   }, [id, navigate]);
 
   const handleUpdate = async (updatedProduct) => {
-    await fetch(`http://localhost:5000/api/products/${id}`, {
+    await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/products/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedProduct),

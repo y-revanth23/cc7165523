@@ -5,7 +5,7 @@ function AddProduct() {
   const navigate = useNavigate();
 
   const handleAdd = async (product) => {
-    await fetch('http://localhost:5000/api/products', {
+    await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/products`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(product),
